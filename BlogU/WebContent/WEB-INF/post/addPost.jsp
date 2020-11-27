@@ -67,7 +67,7 @@
  function searchTag(event){	
 	 var curText = event.target.value;
 	 if(event.keycode === 13){
-		
+		console.log('master branch');
 		console.log('insert tags');
 		$.ajax({
 			"type":"post",
