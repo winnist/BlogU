@@ -21,6 +21,10 @@ public class PostService {
 	
 	
 	public void updatePost(PostVO postVO) {
+		System.out.println("update111111111");
+		System.out.println(postVO.getMemberVO().getMemberId());
+		System.out.println(postVO.getMemberVO());
+		System.out.println(postVO);
 		dao.update(postVO);
 	}
 	

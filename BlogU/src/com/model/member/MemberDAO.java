@@ -23,7 +23,11 @@ public class MemberDAO implements MemberDAO_interface {
 	
 	private static final String GET_ALL_STMT = "from MemberVO order by memberId";
 	private static final String GET_ONE_BY_LOGIN_INFO_STMT = "from MemberVO where email=:email and password=:password";
+	private static final String GET_ONE_BY_EMAIL = "from MemberVO where email=:email";
+	private static final String GET_ONE_BY_GOOGLESUB = "from MemberVO where googleSub=:googleSub";
+	
 	private static final String UPDATE_NAME_AND_PHOTO_BY_ID_STMT = "update MemberVO set mname=:mname, bdate=:bdate, photo=:photo where memberId=:memberId";
+	private static final String UPDATE_GOOGLEINFO = "update MemberVO set googleSub=:googleSub where memberId=:memberId";
 	@Autowired
 	private SessionFactory sessionFactory;
 	
@@ -52,6 +56,15 @@ public class MemberDAO implements MemberDAO_interface {
 		query.setParameter("photo", photo);
 		query.setParameter("bdate", bdate);
 		query.setParameter("memberId", memberId);
+		return query.executeUpdate();
+	}
+	
+	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public int updateGoogleInfo(String userId) {
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery(UPDATE_GOOGLEINFO);
+		query.setParameter("googleSub", userId);
 		return query.executeUpdate();
 	}
 	
@@ -86,6 +99,33 @@ public class MemberDAO implements MemberDAO_interface {
 	public Set<PostVO> getPostsByMemberId(Integer memberId){
 		return this.findByPrimaryKey(memberId).getPosts();
 	}
+
+	@Override
+	public MemberVO findByEmail(String email) {
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery(GET_ONE_BY_EMAIL);
+		query.setParameter("email", email);
+		List<MemberVO> list = query.getResultList();
+		if(list.isEmpty()) {
+			return null;
+		}else return list.get(0);
+	}
+	
+	/**
+	 * parameter: userId-> from google token getSubject()
+	 */
+	@Override
+	public MemberVO findByGoogleSub(String userId) {
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery(GET_ONE_BY_GOOGLESUB);
+		query.setParameter("googleSub", userId);
+		List<MemberVO> list = query.getResultList();
+		if(list.isEmpty()) {
+			return null;
+		}else return list.get(0);
+	}
+	
+	
 
 	@Override
 	public MemberVO findByLoginInfo(String email, String password) {

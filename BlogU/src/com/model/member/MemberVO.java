@@ -14,13 +14,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.model.post.PostVO;
@@ -38,18 +39,19 @@ public class MemberVO implements Serializable {
 	private Date bdate;
 	private String password;
 	private String photo;
+	private String googleSub;
 	
-	@OneToMany(cascade= CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="memberVO")
+	public String getGoogleSub() {
+		return googleSub;
+	}
+
+	public void setGoogleSub(String googleSub) {
+		this.googleSub = googleSub;
+	}
+	@OneToMany(cascade= CascadeType.ALL, mappedBy="memberVO")
 	@OrderBy("postId asc")
 	@Fetch(FetchMode.JOIN)
 	private Set<PostVO> posts = new HashSet<PostVO>();
-	
-//	//��1:�i�{�b�O�]�w�� cascade="all" lazy="false" inverse="true"���N�j
-//	//��2:�imappedBy="�h�誺���p�ݩʦW"�G�Φb���V���p���A�����Y�������v����j�i�ثedeptVO�OEmpVO���@���ݩʡj
-//	//��3:�i��w�]��@OneToMany(fetch=FetchType.LAZY, mappedBy="deptVO")���N�j--> �i�O���쬰  lazy="true"  inverse="true"���N�j
-//	//FetchType.EAGER : Defines that data must be eagerly fetched
-//	//FetchType.LAZY  : Defines that data can be lazily fetched
-//	
 	
 	@JsonIgnore
 	public Set<PostVO> getPosts(){
@@ -67,8 +69,8 @@ public class MemberVO implements Serializable {
 		this.memberId = memberId;
 	}
 	
-	@NotEmpty(message="不可為空")
-	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", message = "只能輸入中文 英文 數字 _ 在2到10之間")
+	@NotEmpty(message="不可為空-姓名")
+	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)(\\s)]{2,10}$", message = "只能輸入中文 英文 數字 _ 在2到10之間")
 	public String getMname() {
 		return mname;
 	}
@@ -76,6 +78,7 @@ public class MemberVO implements Serializable {
 		this.mname = mname;
 	}
 	
+	@NotEmpty(message="不可為空-信箱")
 	@Email(message = "格式錯誤")
 	public String getEmail() {
 		return email;
@@ -85,6 +88,12 @@ public class MemberVO implements Serializable {
 	}
 	
 	
+	//must add formatter convert the data string to data object
+	//method:
+	//		1.add @DataTimeFormat or 
+	//      2.Declare a initbinder in controller to convert the data string to data object
+	//if don't, will occur Exception
+	//@NotNull(message="請輸入生日")
 	//@DateTimeFormat(pattern="yyyy-MM-dd") 
 	public Date getBdate() {
 		return bdate;
@@ -93,6 +102,7 @@ public class MemberVO implements Serializable {
 		this.bdate = bdate;
 	}
 	
+	//@NotEmpty(message="不可為空")
 	@Pattern(regexp = "^[(a-zA-Z0-9_)]{8,}$", message = "只能輸入英文 數字和 _, 英文大小寫 必須含只少一位,密碼長度最少為8位")
 	public String getPassword() {
 		return password;

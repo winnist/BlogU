@@ -24,4 +24,11 @@ public class tagController {
 		System.out.println("-----------"+tagName+"--------33");
 		return tagSvc.findByName(tagName);
 	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="insert")
+	public @ResponseBody Set<TagVO> insert(@PathVariable("tagName")String tagName){
+		System.out.println("-----------"+tagName+"--------33");
+		tagSvc.
+		return 
+	}
 }

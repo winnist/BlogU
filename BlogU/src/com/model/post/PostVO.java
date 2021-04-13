@@ -47,10 +47,10 @@ public class PostVO implements Serializable {
 	
 //	//ower the relationship post_tag
 	@ManyToMany
-	@JoinTable(name = "post_tag", joinColumns = {@JoinColumn(name="postId_fk")}, inverseJoinColumns = { @JoinColumn(name="tagId_fk")})
+	@JoinTable(name = "post_tag", joinColumns = {@JoinColumn(name="postId")}, inverseJoinColumns = { @JoinColumn(name="tagId")})
 	private Set<TagVO> tags = new HashSet<TagVO>();
 	
-	@OneToMany(cascade= CascadeType.ALL, fetch =FetchType.LAZY, mappedBy = "postVO")
+	@OneToMany(cascade= CascadeType.ALL, mappedBy = "postVO")
 	@Fetch(FetchMode.JOIN)
 	private Set<CommentVO> comments = new HashSet<CommentVO>();
 	
@@ -98,6 +98,7 @@ public class PostVO implements Serializable {
 		this.content = content;
 	}
 	
+	@JsonIgnore
 	public Set<TagVO> getTags(){
 		return this.tags;
 	}

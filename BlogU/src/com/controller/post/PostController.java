@@ -3,6 +3,7 @@ package com.controller.post;
 
 import java.sql.Timestamp;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,8 @@ import com.model.member.MemberService;
 import com.model.member.MemberVO;
 import com.model.post.PostService;
 import com.model.post.PostVO;
+
+
 
 @Controller
 @RequestMapping("/post")
@@ -127,13 +131,20 @@ public class PostController {
 	public String update(@Valid PostVO postVO, BindingResult result, ModelMap model, HttpServletRequest req) {
 		
 		if(result.hasErrors()) {
-			model.addAttribute("actionStatus", "更新失敗");
+			System.out.println("error update");
+			List<ObjectError> list = result.getAllErrors();
+			String errormsg = null;
+			for(ObjectError e : list) {
+				errormsg = e.getCode()+e.getDefaultMessage();
+				
+			}
+			model.addAttribute("statusMsg", "更新失敗"+errormsg);
 			return "post/listOnePost";
 		}
-		
+		System.out.println("update!!!!!!!!!!!!!!!!!!");
 //		postVO.setPostDate(new Timestamp(System.currentTimeMillis()));
 		postSvc.updatePost(postVO);
-		model.addAttribute("actionStatus", "更新成功");
+		model.addAttribute("statusMsg", "更新成功");
 		
 		return "post/listOnePost";
 		

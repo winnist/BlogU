@@ -3,6 +3,7 @@ package com.model.post;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -45,10 +46,15 @@ public class PostDAO implements PostDAO_interface {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void delete(Integer postId) {
 		
+		//不影響MemberVO的前提下  刪除POST 和POST底下的COMMENT
 		Session session = sessionFactory.getCurrentSession();
-		Query query = session.createQuery("delete PostVO where postId=:postId");
-		query.setParameter("postId", postId);
-		query.executeUpdate();
+		Query queryComment = session.createQuery("delete CommentVO where postId=:postId");
+		queryComment.setParameter("postId", postId);
+		queryComment.executeUpdate();
+		
+		Query queryPost = session.createQuery("delete PostVO where postId=:postId");
+		queryPost.setParameter("postId", postId);
+		queryPost.executeUpdate();		
 	}
 	
 	@Override

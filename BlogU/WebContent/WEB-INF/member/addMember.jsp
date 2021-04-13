@@ -12,7 +12,9 @@
 <%-- <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/error.css" /> --%>
 </head>
 <body>
+<h1>${message}</h1>
 	<h1>加入會員 ${actionStatus}</h1>
+<!-- 	After spring version 5, commandName was removed,  should use modelAttribute -->
 		<form:form action="${pageContext.request.contextPath}/member/insert" method="POST" modelAttribute="memberVO">
 			<table>
 				<tr>
@@ -28,7 +30,7 @@
 				
 				<tr>
 					<td width="10%">password:</td>
-					<td width="35%"><form:password path="password" id="password"/></td>
+					<td width="35%"><form:input path="password" id="password"/></td>
 					<td width="55%"><form:errors path="password" ></form:errors>
 				</tr>
 				

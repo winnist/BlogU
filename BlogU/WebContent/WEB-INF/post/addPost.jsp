@@ -41,9 +41,9 @@
 	<hr>
 	<form:textarea cols="50" path="content" id="content" value="${postVO.content}" placeholder="Write your post..."></form:textarea>
 	<form:errors path="content"/>
-	<form:input type="text" path="tags" id="tags" value="null" disabled="disabled"/>
-	<input type="text" id="tagSearch"/>
-	<div id="divTags"></div>
+<%-- 	<form:input type="text" path="tags" id="tags" value="null" disabled="disabled"/> --%>
+<!-- 	<input type="text" id="tagSearch"/> -->
+<!-- 	<div id="divTags"></div> -->
 	<input type="submit" value="POST"/> 
 </form:form>
 <a href="${pageContext.request.contextPath}/post/listAllPost/${sessionScope.memberId}">Back to Post List</a>
@@ -58,36 +58,26 @@
  window.addEventListener("DOMContentLoaded", init);
  
  function init(){
-	 tag = document.getElementById("tagSearch");
-	 tag.addEventListener("keyup", searchTag);
+// 	 tag = document.getElementById("tagSearch");
+// 	 tag.addEventListener("keyup", searchTag);
 	
-	 divTags = document.getElementById("divTags");
+// 	 divTags = document.getElementById("divTags");
  }
  
  function searchTag(event){	
 	 var curText = event.target.value;
 	 if(event.keycode === 13){
 
-		console.log('master branch');
-
-		console.log('test_branch');
-
-		console.log('insert tags');
 		$.ajax({
 			"type":"post",
 			"dataType":"json",
 			"url": contextPath +"/tag/insert",
 			"data": curText,
-			"success":
+			"success": function(data) {
+				console.log(data);
+			}
 		});
-		$.ajax({
-			"type":"post",
-			"url": contextPath + "/comment/insert",
-			"dataType":"json",
-			"data": formData,
-			"success":function(data){		
-		return;
-	 }
+		
 	 
 	 console.log('searchtag');
 	
@@ -109,24 +99,24 @@
 	 if(xhr.readyState == 4){
 		if(xhr.status == 200){	
 			
-			datas = JSON.parse(xhr.responseText);
-			for(var i = 0; i<datas.length; i++){
-				var eTag = document.createElement("label");
-				var tTag = document.createTextNode(datas[i].tagName);
-				eTag.appendChild(tTag);
-				eTag.addEventListener("click", function(){
-					console.log("form tags"+ document.postForm.tags.value.length);
-					var tagArray = document.postForm.tags.value.split(",");
-					if()
-					tagArray.push(this.firstChild.nodeValue);
-					document.postForm.tags.value = tagArray.toString();
-				});
+// 			datas = JSON.parse(xhr.responseText);
+// 			for(var i = 0; i<datas.length; i++){
+// 				var eTag = document.createElement("label");
+// 				var tTag = document.createTextNode(datas[i].tagName);
+// 				eTag.appendChild(tTag);
+// 				eTag.addEventListener("click", function(){
+// 					console.log("form tags"+ document.postForm.tags.value.length);
+// 					var tagArray = document.postForm.tags.value.split(",");
+// 					if()
+// 					tagArray.push(this.firstChild.nodeValue);
+// 					document.postForm.tags.value = tagArray.toString();
+// 				});
 				
-				var eLine = document.createElement("hr");
-				divTags.appendChild(eTag);
-				divTags.appendChild(eLine);
+// 				var eLine = document.createElement("hr");
+// 				divTags.appendChild(eTag);
+// 				divTags.appendChild(eLine);
 				
-			}						
+			}
 		}
 	}		
  }

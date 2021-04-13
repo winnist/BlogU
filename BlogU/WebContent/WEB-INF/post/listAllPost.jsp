@@ -25,14 +25,13 @@ ${actionStatus}
 	<c:forEach var="postVO" items="${postsByMemberId}">
 		<tr>
 			<td>
-			<h1>${postVO.title}</h1>
-			<br>
-			<h3>${postVO.postDate}</h3>
-			<hr>
-			<h5>${postVO.content}</h5>	
+			<h6>${postVO.postDate}</h6>
+			<h1>${postVO.title}</h1>			
+			<h4>${postVO.content}</h4>	
 			
 			<a href="<%=request.getContextPath() %>/post/getOneForList/${postVO.postId}">read more...</a>
-			
+
+		
 			<form action="<%=request.getContextPath()%>/post/delete" method="POST">
 				<input type="hidden" name="postId" value="${postVO.postId}"/>
 				<input type="hidden" name="memberId" value="${postVO.memberVO.memberId}"/>
@@ -43,6 +42,7 @@ ${actionStatus}
 				
 				<input type="submit" value="修改" onclick="return confirm('確定修改?')"/>				
 			</form>
+			<hr>
 			</td>
 		</tr>
 	</c:forEach>

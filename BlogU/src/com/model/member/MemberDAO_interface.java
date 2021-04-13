@@ -22,4 +22,7 @@ public interface MemberDAO_interface {
 	public Set<PostVO> getPostsByMemberId(Integer memberId);
 	public int updateProfile(String mname, String photo, Date bdate, Integer memberId);
 	//public Set<PostVO> getPostsByPojo(MemberVO memberVO);
+	public MemberVO findByEmail(String email);
+	public MemberVO findByGoogleSub(String userId);
+	public int updateGoogleInfo(String userId);
 }

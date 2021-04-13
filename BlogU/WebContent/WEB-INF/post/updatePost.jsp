@@ -43,7 +43,8 @@
 	<form:textarea cols="50" path="content" id="content" value="${postVO.content}" placeholder="Write your post..."></form:textarea>
 	<form:errors path="content"/>
 	<form:hidden path="postId" value="${postVO.postId}"/>
-	<form:hidden path="memberVO" value="${postVO.memberVO}"/>
+	<form:hidden path="memberVO.memberId" value="${postVO.memberVO.memberId}"/>
+	<form:errors path="memberVO"/>
 	<form:hidden path="postDate" value="${postVO.postDate}"/>
 	<input type="submit" value="POST" > 
 </form:form>

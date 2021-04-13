@@ -14,4 +14,8 @@ public class TagService {
 	public Set<TagVO> findByName(String name) {
 		return dao.findByName(name);
 	}
+	
+	public void insert(TagVO tagVO) {
+		
+	}
 }

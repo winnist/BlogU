@@ -2,6 +2,7 @@ package com.controller.member;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Set;
 
@@ -9,15 +10,20 @@ import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,11 +51,11 @@ public class MemberController {
 	@Autowired
 	ServletContext servletContext;
 	
-	String photoSaveDirectory = "resources/img/photo_upload";
+	String photoSaveDirectory = "resources/img/photo_upload/";
 	
 	@RequestMapping(method=RequestMethod.GET, value="addMember")
 	public String addMember(ModelMap model) {
-		System.out.println("hello");
+		System.out.println("helloaddmember");
 		//For addMember.jsp, Tag <form:form>'s modelAttribute to use. must have 
 //		MemberVO memberVO = new MemberVO();
 //		model.addAttribute("memberVO", memberVO);
@@ -74,8 +82,8 @@ public class MemberController {
 		
 		List<MemberVO> memberList = memberSvc.getAll();
 		System.out.println("--"+memberList);
-		System.out.print(JSONValue.toJSONString(memberList));
-		System.out.print("jsonArray"+JSONArray.toJSONString(memberList));
+		System.out.println(JSONValue.toJSONString(memberList));
+		System.out.println("jsonArray"+JSONArray.toJSONString(memberList));
 		
 		return memberList;
 	}
@@ -114,7 +122,7 @@ public class MemberController {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "insert")
 	public String insert(@Valid MemberVO memberVO, BindingResult result, ModelMap model) {
-		System.out.println(memberVO.getMname());
+		System.out.println("123"+memberVO.getMname());
 		System.out.println(memberVO.getPassword());
 		if(result.hasErrors()) {
 			System.out.println("error insert");
@@ -155,18 +163,32 @@ public class MemberController {
 
 	
 	@RequestMapping(method=RequestMethod.POST, value="update")
-	public String update(@Valid MemberVO memberVO, BindingResult result, @RequestPart("image") Part image, ModelMap model) throws IOException {
+	public String update(@Valid MemberVO memberVO, BindingResult result, @RequestPart("image") Part image, ModelMap model) {
 		
 		if(result.hasErrors()) {
-			model.addAttribute("actionStatus", "更新會員失敗");
+			
+			List<ObjectError> list = result.getAllErrors();
+			String errormsg = null;
+			for(ObjectError e : list) {
+				errormsg = e.getCode()+e.getDefaultMessage();
+				
+			}
+			model.addAttribute("actionStatus", "更新會員失敗"+errormsg+memberVO.getEmail()+memberVO.getMname());
 			return "member/updateMember";
 		}
 		
 			
 		//Try 1: save photo to server
-		if(image.getSubmittedFileName() != null && image.getContentType() != null) {
+		System.out.println("photo"+image.getSubmittedFileName());
+		if(image.getSubmittedFileName() != null && image.getSubmittedFileName().length()>0 && image.getContentType()!=null) {
 			
-			String realPath = servletContext.getResource("/").getPath();
+			String realPath="";
+			try {
+				realPath = servletContext.getResource("/").getPath();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			String fsavePath = realPath + photoSaveDirectory;
 			System.out.println("path"+fsavePath);
 			File fsaveDirectory = new File(fsavePath);
@@ -176,12 +198,31 @@ public class MemberController {
 			
 			String imgName = image.getSubmittedFileName();
 			String imageType = imgName.substring(imgName.lastIndexOf("."));
-			String reName = memberVO.getMemberId() + imageType;
+			//give unique number to imgName to avoid image cache.
+			String reName = memberVO.getMemberId()+String.valueOf(System.currentTimeMillis()) + imageType;
 			File f = new File(fsaveDirectory, reName);
 			
-			image.write(f.toString());
+			try {
+				image.write(f.toString());
+				image.delete();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
+			//delete old photo
+			System.out.println(memberVO.getPhoto());
+			if(memberVO.getPhoto()!= null && memberVO.getPhoto().length() > 0) {
+				File oldPhoto = new File(fsavePath+memberVO.getPhoto());
+				if(oldPhoto.exists()) {
+					oldPhoto.delete();
+					System.out.print("delete old photo success");
+				}
+			}
 			memberVO.setPhoto(reName);
+			
+			
+			
 			/**
 			 // Try 2: save photo to database;
 			 
@@ -191,6 +232,7 @@ public class MemberController {
 			in.close();
 			memberVO.setPhoto(buf);
 			**/
+			
 		}else {
 			System.out.println("photo is null");
 		}
@@ -209,24 +251,13 @@ public class MemberController {
 		 return "post/listAllPost";
 	}
 	
-//	@ExceptionHandler(value = { ConstraintViolationException.class })
-//	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//	public ModelAndView handleValidError(HttpServletRequest req,ConstraintViolationException e) {
-//	    Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-//	    StringBuilder strBuilder = new StringBuilder();
-//	    for (ConstraintViolation<?> violation : violations ) {
-//	          strBuilder.append(violation.getMessage() + "<br>");
-//	    }
-//	    String message = strBuilder.toString();
-//	    return new ModelAndView("errorPage", "message", "錯誤訊息:<br>"+message);
-//	}
 	
-//	@ExceptionHandler(value = Exception.class)
-//	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//	public ModelAndView handleAllError(HttpServletRequest req,Exception e) {
-//		
-//	    String message = e.getMessage();
-//	    return new ModelAndView("errogPage", "message", "錯誤訊息:<br>" + message);
-//	}
+	@ExceptionHandler(value = Exception.class)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public ModelAndView handleAllError(HttpServletRequest req,Exception e) {
+		
+	    String message = e.getMessage();
+	    return new ModelAndView("errorPage", "message", "錯誤訊息:<br>" + message);
+	}
 
 }

@@ -40,13 +40,14 @@ public class MemberService {
 	
 	//not use Spring MVC
 	public MemberVO addMember(String mName, String email, Date bdate, String password,
-	 String photo) {
+	 String photo, String googleSub) {
 		MemberVO memberVO = new MemberVO();
 		memberVO.setMname(mName);
 		memberVO.setEmail(email);
 		memberVO.setBdate(bdate);
 		memberVO.setPassword(password);
 		memberVO.setPhoto(photo);
+		memberVO.setGoogleSub(googleSub);
 		dao.insert(memberVO);
 		return memberVO;
 	}
@@ -65,10 +66,13 @@ public class MemberService {
 	public int updateProfile(String mname, String photo, Date bdate, Integer memberId) {
 		return dao.updateProfile(mname, photo, bdate, memberId);
 	}
-
+	
+	public int updateGoogleInfo(String userId) {
+		return dao.updateGoogleInfo(userId);
+	}
 	
 	public MemberVO updateMember(Integer memberId, String mName, String email, Date bdate, String password,
-	 String photo) {
+	 String photo, String googleSub) {
 		MemberVO memberVO = new MemberVO();
 		memberVO.setMemberId(memberId);
 		memberVO.setMname(mName);
@@ -76,6 +80,7 @@ public class MemberService {
 		memberVO.setBdate(bdate);
 		memberVO.setPassword(password);
 		memberVO.setPhoto(photo);
+		memberVO.setGoogleSub(googleSub);
 		dao.update(memberVO);
 		return memberVO;
 	}
@@ -84,4 +89,11 @@ public class MemberService {
 		return dao.findByLoginInfo(email, password);
 	}
 	
+	public MemberVO findByGoogleMail(String emailFromGoogle) {
+		return dao.findByEmail(emailFromGoogle);
+	}
+	
+	public MemberVO findByGoogleSub(String googleSub) {
+		return dao.findByGoogleSub(googleSub);
+	}
 }

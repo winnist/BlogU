@@ -15,11 +15,12 @@ ${actionStatus}
 <form:form action="${pageContext.request.contextPath}/member/update" method="post"  enctype="multipart/form-data" modelAttribute="memberVO">
 	名字:<form:input path="mname" value="${memberVO.mname}"/>
 		<form:errors path="mname"/>
-	Email:<form:input path="email" value="${memberVO.email}" disabled="true"/> 
+	Email:<form:input path="email" value="${memberVO.email}"  readonly="true" /> 
 		<form:errors path="email"/>
 	生日:<form:input type="date" path="bdate"  placeholder="格式:yyyy-mm-dd"/>
 		<form:errors path="bdate"/>
 		<form:input type="hidden" path="memberId" value="${memberVO.memberId}"/>
+		<form:input type="hidden" path="photo" value="${memberVO.photo}"/>
 	Icon:
 		
 	

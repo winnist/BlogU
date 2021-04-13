@@ -91,7 +91,7 @@ function loadComments(){
 	
 	if(xhr != null){
 		xhr.addEventListener("readystatechange", function(){
-			
+			console.log(xhr.responseText);
 			if(xhr.readyState == 4){
 				if(xhr.status == 200){
 					console.log(xhr.responseText);
